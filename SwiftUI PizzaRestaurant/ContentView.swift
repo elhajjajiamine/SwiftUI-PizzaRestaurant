@@ -11,70 +11,144 @@ import CoreData
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
-        animation: .default)
-    private var items: FetchedResults<Item>
+    @FetchRequest(entity: Order.entity(), sortDescriptors: [], predicate: NSPredicate(format: "status != %@", Status.completed.rawValue))
+
+    var orders: FetchedResults<Order>
+    
+    @State var showOrderSheet = false
 
     var body: some View {
-        List {
-            ForEach(items) { item in
-                Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+       
+        NavigationView {
+            List {
+                ForEach(orders) { order in
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("\(order.pizzaType) - \(order.numberOfSlices) slices")
+                                .font(.headline)
+                            Text("Table \(order.tableNumber)")
+                                .font(.subheadline)
+                        }
+                        Spacer()
+                        Button(action: {
+                            updateOrder(order: order)
+                        }) {
+                            Text(order.orderStatus == .pending ? "Prepare" : "Complete")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .frame(height: 50)
+                }
+                .onDelete { indexSet in
+                            for index in indexSet {
+                                viewContext.delete(orders[index])
+                            }
+                            do {
+                                try viewContext.save()
+                            } catch {
+                                print(error.localizedDescription)
+                            }
+                        }
             }
-            .onDelete(perform: deleteItems)
-        }
-        .toolbar {
-            #if os(iOS)
-            EditButton()
-            #endif
+                .listStyle(PlainListStyle())
+                .navigationTitle("My Orders")
+                .navigationBarItems(trailing: Button(action: {
+                    print("Open order sheet")
+                }, label: {
+                    Image(systemName: "plus.circle")
+                        .imageScale(.large)
+                }))
+            
+           
+                .navigationTitle("My Orders")
+            .navigationBarItems(trailing: Button(action: {
+                showOrderSheet = true
+            }, label: {
+                Image(systemName: "plus.circle")
+                    .imageScale(.large)
+            }))
+            .sheet(isPresented: $showOrderSheet) {
+                OrderSheet()
+            }
 
-            Button(action: addItem) {
-                Label("Add Item", systemImage: "plus")
+        }
+        
+        
+        }
+    
+    func updateOrder(order: Order) {
+            let newStatus = order.orderStatus == .pending ? Status.preparing : .completed
+            viewContext.performAndWait {
+                order.orderStatus = newStatus
+                try? viewContext.save()
             }
         }
     }
 
-    private func addItem() {
-        withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-}
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
-
+   
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
     }
 }
+
+
+
+
+
+
+struct OrderSheet: View {
+    
+    @Environment(\.managedObjectContext) private var viewContext
+    @Environment (\.presentationMode) var presentationMode
+
+
+    let pizzaTypes = ["Pizza Margherita", "Greek Pizza", "Pizza Supreme", "Pizza California", "New York Pizza"]
+    
+    @State var selectedPizzaIndex = 1
+    @State var numberOfSlices = 1
+    @State var tableNumber = ""
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Pizza Details")) {
+                    Picker(selection: $selectedPizzaIndex, label: Text("Pizza Type")) {
+                        ForEach(0 ..< pizzaTypes.count) {
+                                Text(self.pizzaTypes[$0]).tag($0)
+                        }
+                    }
+                    
+                    Stepper("\(numberOfSlices) Slices", value: $numberOfSlices, in: 1...12)
+                }
+                
+                Section(header: Text("Table")) {
+                    TextField("Table Number", text: $tableNumber)
+                        .keyboardType(.numberPad)
+                    
+                }
+                
+                Button(action: {
+                    guard self.tableNumber != "" else {return}
+                       let newOrder = Order(context: viewContext)
+                       newOrder.pizzaType = self.pizzaTypes[self.selectedPizzaIndex]
+                       newOrder.orderStatus = .pending
+                       newOrder.tableNumber = self.tableNumber
+                       newOrder.numberOfSlices = Int16(self.numberOfSlices)
+                       newOrder.id = UUID()
+                    do {
+                        try viewContext.save()
+                        print("Order saved.")
+                        presentationMode.wrappedValue.dismiss()
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }) {
+                    Text("Add Order")
+                }
+            }
+                .navigationTitle("Add Order")
+        }
+    }
+}
+

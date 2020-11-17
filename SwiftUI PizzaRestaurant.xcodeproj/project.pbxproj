@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		100385CD2563D7F400086EEF /* Order+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100385CB2563D7F400086EEF /* Order+CoreDataClass.swift */; };
+		100385CE2563D7F400086EEF /* Order+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 100385CC2563D7F400086EEF /* Order+CoreDataProperties.swift */; };
 		106773902563D58600DA25D3 /* SwiftUI_PizzaRestaurantApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1067738F2563D58600DA25D3 /* SwiftUI_PizzaRestaurantApp.swift */; };
 		106773922563D58600DA25D3 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106773912563D58600DA25D3 /* ContentView.swift */; };
 		106773942563D58700DA25D3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 106773932563D58700DA25D3 /* Assets.xcassets */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		100385CB2563D7F400086EEF /* Order+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Order+CoreDataClass.swift"; sourceTree = "<group>"; };
+		100385CC2563D7F400086EEF /* Order+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Order+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		1067738C2563D58600DA25D3 /* SwiftUI PizzaRestaurant.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SwiftUI PizzaRestaurant.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1067738F2563D58600DA25D3 /* SwiftUI_PizzaRestaurantApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUI_PizzaRestaurantApp.swift; sourceTree = "<group>"; };
 		106773912563D58600DA25D3 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -40,6 +44,8 @@
 		106773832563D58600DA25D3 = {
 			isa = PBXGroup;
 			children = (
+				100385CB2563D7F400086EEF /* Order+CoreDataClass.swift */,
+				100385CC2563D7F400086EEF /* Order+CoreDataProperties.swift */,
 				1067738E2563D58600DA25D3 /* SwiftUI PizzaRestaurant */,
 				1067738D2563D58600DA25D3 /* Products */,
 			);
@@ -144,9 +150,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				100385CE2563D7F400086EEF /* Order+CoreDataProperties.swift in Sources */,
 				106773992563D58700DA25D3 /* Persistence.swift in Sources */,
 				1067739C2563D58700DA25D3 /* SwiftUI_PizzaRestaurant.xcdatamodeld in Sources */,
 				106773922563D58600DA25D3 /* ContentView.swift in Sources */,
+				100385CD2563D7F400086EEF /* Order+CoreDataClass.swift in Sources */,
 				106773902563D58600DA25D3 /* SwiftUI_PizzaRestaurantApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
